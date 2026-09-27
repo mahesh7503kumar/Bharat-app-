@@ -1,0 +1,50 @@
+{
+  "summary": "Full-stack test of Bharat App Builder. Backend: 14/14 pytest tests PASS (100%). Frontend: Home + Assistant chat + Preview + APK button work; SuperAdmin 3-lock flow (email → OTP with devOtp toast → face-dev-fallback → panel) works. However a critical UpdateModal overlay blocks the UI whenever appUpdates.latestVersion !== REACT_APP_VERSION (i.e., after any publish). This intermittently breaks the Legal Shield checkbox, the LOCK2/LOCK3 flow, the Builder tab, and all 8 superadmin tabs. Backend logic itself is sound.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/superadmin/send-otp", "issue": "Stores by raw 'mobile' but frontend sends '+91'+mobile — behavior is consistent (frontend uses the same prefix on verify) but any external caller using bare 10-digit will fail to verify. Consider normalising to E.164 server-side."},
+      {"endpoint": "POST /api/apk/generate-config", "issue": "Fallback `com.bharat.app` short-circuit is broken: `('com.bharat.' + '') or 'com.bharat.app'` returns 'com.bharat.' because non-empty string is truthy. Empty appName currently yields 'com.bharat.'."},
+      {"endpoint": "POST /api/superadmin/verify-email", "issue": "Body is `{data: {email}}` (ConfigPayload). Not consistent with typed OtpRequest for the other lock steps — a dedicated pydantic model would be cleaner."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "App.js UpdateModal", "issue": "Full-screen modal overlay (z-[100], fixed inset-0) is shown on every route whenever appUpdates.latestVersion !== REACT_APP_VERSION. Comparison is `!==` on strings, so any value other than the hard-coded APP_VERSION triggers it. Modal has no localStorage 'dismissed' memory — reappears on every navigation and blocks Legal Shield checkbox, LOCK2 OTP inputs, all 8 SuperAdmin tabs and the Builder tab. Post-first-publish this blocks the ENTIRE app.", "selector": "[data-testid=\"update-modal\"]", "priority": "CRITICAL"},
+      {"component": "YourAssistantBrain assistant-preview-link", "issue": "Uses <button onClick={navigate}> rather than a <Link>, so it has no href attribute — minor testability nit but functionally works.", "selector": "[data-testid=\"assistant-preview-link\"]", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Publish + APK / Update propagation", "issue": "POST /api/app-updates immediately makes the UpdateModal appear for the current user (self), because App.js compares latestVersion to a constant APP_VERSION=1.0.0. Publishing v1.0.1 (the default value in Tab F) instantly puts the app into a stuck 'update available' state until page reload logic is fixed.", "affected_selectors": ["[data-testid=\"update-modal\"]", "[data-testid=\"publish-btn\"]"]}
+    ],
+    "design_issues": [
+      {"screen": "Global", "issues": ["UpdateModal has no semver comparison — any string mismatch triggers it, even downgrades", "UpdateModal 'Later' does not persist choice — reappears on every route change/reload"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "CRITICAL: Fix UpdateModal in /app/frontend/src/App.js — (1) use semver compare so equal versions don't trigger, (2) persist dismissal in localStorage per-version, (3) consider using a top banner instead of full-screen z-100 overlay, (4) exclude routes like /superadmin from the modal so admin flows aren't blocked.",
+    "MEDIUM: Reset appUpdates DB collection or manually set latestVersion back to 1.0.0 so preview environment is usable now.",
+    "MINOR: Fix apk_config fallback in server.py — `pkg = ('com.bharat.' + slug) if slug else 'com.bharat.app'`.",
+    "MINOR: Normalise mobile numbers server-side (strip '+', country code) in send-otp/verify-otp to avoid ambiguity."
+  ],
+  "critical_code_review_comments": [
+    "App.js UpdateModal: string `!==` compare is fragile; use semver and localStorage 'update-dismissed-v{X}' key; do not render as blocking overlay on SuperAdmin/Preview routes.",
+    "server.py apk_config: `pkg = 'com.bharat.' + slug or 'com.bharat.app'` binds `or` to slug — logic bug producing 'com.bharat.' for empty appName.",
+    "server.py: `@app.on_event('startup')` and `@app.on_event('shutdown')` are deprecated in FastAPI 0.110+ — should migrate to lifespan handlers.",
+    "SuperAdmin.jsx is 600 lines — should be split (per lock, per tab) into smaller files for maintainability (>700 line rule almost hit).",
+    "assistant_chat: no rate-limiting or authentication — any anonymous caller can create apps and burn Gemini quota."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "~55% (blocked by UpdateModal)"},
+  "test_credentials": "Owner email Mahesh7503kumar@gmail.com; SuperAdmin mobile 9876543210 (any 10-digit works); devOtp returned in send-otp response + toast; face-dev-fallback-btn for headless.",
+  "seed_data_creation": "Backend tests created a few TEST_-prefixed apps and one TEST_Clone_* builder; all cleaned up. Publishing tests inserted appUpdates versions 9.9.xxx which now trigger the UpdateModal — main agent should either clear db.appUpdates or delete versions != '1.0.0'.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend is solid (100% test pass). The UpdateModal in App.js is currently blocking most frontend flows in the preview env because backend_test.py published versions like 9.9.480 during a publish_and_latest test. After the main agent (a) fixes the modal semver/dismissal logic and (b) either resets db.appUpdates or ignores non-latest by-releaseDate, re-run the frontend script from this iteration. All data-testids are present and correct. Face-dev-fallback path is confirmed working — no camera in headless.",
+  "rca of the issue": "RCA — UpdateModal overlay: /app/frontend/src/App.js:12-48 mounts a fixed inset-0 z-[100] modal whenever `latestUpdate.latestVersion !== APP_VERSION` (string comparison, no semver, no dismissal memory). Because POST /api/app-updates upserts by version and GET /api/app-updates/latest sorts by releaseDate desc, ANY publish (including 1.0.1 default in Tab F Publish button) sets latestVersion != '1.0.0' → modal shows on every route load and blocks LegalShield/OTP/tab clicks. Reproduction: click Tab F → 'Publish + FCM Push' once → refresh any page → full-screen modal now blocks all UI. Mitigation: (1) semver `gt(latestVersion, APP_VERSION)` compare, (2) localStorage 'update-dismissed:'+version, (3) render as toast/top banner instead of full-screen, (4) DB cleanup: `db.appUpdates.delete_many({version: {$ne: '1.0.0'}})` for immediate preview recovery."
+}

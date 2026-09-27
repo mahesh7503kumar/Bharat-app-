@@ -383,7 +383,8 @@ async def publish_update(payload: PublishUpdate):
 @api_router.post("/apk/generate-config")
 async def apk_config(payload: ConfigPayload):
     app_name = payload.data.get("appName", "myapp")
-    pkg = "com.bharat." + re.sub(r"[^a-z0-9]", "", app_name.lower()) or "com.bharat.app"
+    slug = re.sub(r"[^a-z0-9]", "", app_name.lower())
+    pkg = f"com.bharat.{slug}" if slug else "com.bharat.app"
     steps = ["npm run build", "npx cap add android", "npx cap copy android", "npx cap open android"]
     return {
         "appName": app_name, "packageName": pkg, "steps": steps,
