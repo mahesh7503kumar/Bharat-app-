@@ -8,7 +8,6 @@ import {
   CheckCircle2, RefreshCw, Package, Download,
 } from "lucide-react";
 import { api, OWNER_EMAIL, ASSISTANT_NAME } from "../lib/api";
-import { loadFaceModels, detectDescriptor, euclideanDistance } from "../lib/face";
 
 const inp = "w-full bg-black border border-purple-700/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500";
 const lbl = "text-[11px] text-zinc-400 mb-1 block";
@@ -29,7 +28,7 @@ function EmailLock({ onPass }) {
     }
   };
   return (
-    <LockShell step={1} icon={Mail} title="Owner Email Verification" sub="Step 1 / 3">
+    <LockShell step={1} icon={Mail} title="Owner Email Verification" sub="Step 1 / 2">
       <label className={lbl}>Owner Email</label>
       <input data-testid="superadmin-3lock-email-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={OWNER_EMAIL} className={inp} />
       <button data-testid="email-lock-submit" onClick={submit} className="btn-purple w-full rounded-full py-2.5 mt-3 text-sm font-bold">Verify Email</button>
@@ -79,7 +78,7 @@ function OtpLock({ onPass }) {
   };
 
   return (
-    <LockShell step={2} icon={Smartphone} title="🔐 Owner Mobile Verification" sub="Step 2 / 3 · Real SMS OTP">
+    <LockShell step={2} icon={Smartphone} title="🔐 Owner Mobile Verification" sub="Step 2 / 2 · Real SMS OTP">
       {!sent ? (
         <>
           <label className={lbl}>Mobile Number</label>
@@ -108,90 +107,14 @@ function OtpLock({ onPass }) {
   );
 }
 
-/* ============ LOCK 3: FACE ID ============ */
-function FaceLock({ onPass }) {
-  const videoRef = useRef(null);
-  const [status, setStatus] = useState("Loading face models...");
-  const [ready, setReady] = useState(false);
-  const [fails, setFails] = useState(0);
-  const [locked, setLocked] = useState(false);
-  const [modelsFailed, setModelsFailed] = useState(false);
-
-  useEffect(() => {
-    let stream;
-    (async () => {
-      try {
-        await loadFaceModels();
-        setStatus("Position your face in frame");
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-        if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
-        setReady(true);
-      } catch (e) {
-        setModelsFailed(true);
-        setStatus("Camera/models unavailable in this environment");
-      }
-    })();
-    return () => stream?.getTracks().forEach((t) => t.stop());
-  }, []);
-
-  const verify = async () => {
-    if (locked) return;
-    setStatus("Scanning face...");
-    const desc = await detectDescriptor(videoRef.current);
-    if (!desc) { setStatus("No face detected — try again"); return; }
-    const saved = await api.getFace().catch(() => ({}));
-    if (!saved || !saved.faceDescriptor) {
-      await api.saveFace(desc);
-      toast.success("Face enrolled ✅ (first-time owner)");
-      onPass();
-      return;
-    }
-    const dist = euclideanDistance(saved.faceDescriptor, desc);
-    if (dist < 0.55) {
-      await api.saveFace(desc);
-      toast.success("Face ID matched ✅");
-      onPass();
-    } else {
-      const f = fails + 1; setFails(f);
-      await api.faceFail().catch(() => {});
-      if (f >= 3) { setLocked(true); toast.error("3 failed attempts — locked 30 min"); }
-      else toast.error(`Face mismatch (${f}/3)`);
-      setStatus(`Face mismatch (distance ${dist.toFixed(2)})`);
-    }
-  };
-
-  const devEnroll = async () => {
-    const pseudo = Array.from({ length: 128 }, () => Math.random() * 0.1);
-    await api.saveFace(pseudo);
-    toast.success("Owner face verified (dev fallback)");
-    onPass();
-  };
-
-  return (
-    <LockShell step={3} icon={ScanFace} title="Biometric Face ID" sub="Step 3 / 3 · face-api.js">
-      <div className="rounded-xl overflow-hidden border border-purple-700/40 bg-black aspect-video flex items-center justify-center">
-        <video data-testid="superadmin-3lock-faceid-video" ref={videoRef} muted playsInline className="w-full h-full object-cover" />
-      </div>
-      <p className="text-xs text-zinc-400 mt-2 text-center">{status}</p>
-      {!modelsFailed ? (
-        <button data-testid="verify-face-btn" disabled={!ready || locked} onClick={verify} className="btn-gold w-full rounded-full py-2.5 mt-3 text-sm font-bold disabled:opacity-50">
-          {locked ? "Locked (30 min)" : "Verify Face"}
-        </button>
-      ) : (
-        <button data-testid="face-dev-fallback-btn" onClick={devEnroll} className="btn-gold w-full rounded-full py-2.5 mt-3 text-sm font-bold">
-          Continue (camera unavailable)
-        </button>
-      )}
-    </LockShell>
-  );
-}
+/* ============ FACE ID LOCK REMOVED — 2-Lock flow (Email + SMS OTP) ============ */
 
 function LockShell({ step, icon: Icon, title, sub, children }) {
   return (
     <div className="min-h-screen bharat-glow flex items-center justify-center p-4">
       <div className="card-purple p-6 max-w-sm w-full fadeup">
         <div className="flex items-center gap-1 mb-4">
-          {[1, 2, 3].map((s) => (
+          {[1, 2].map((s) => (
             <div key={s} className={`h-1.5 flex-1 rounded-full ${s <= step ? "bg-purple-500" : "bg-white/10"}`} />
           ))}
         </div>
@@ -202,7 +125,7 @@ function LockShell({ step, icon: Icon, title, sub, children }) {
         <p className="text-[11px] gold-text text-center mb-4">{sub}</p>
         {children}
         <p className="text-[10px] text-zinc-600 text-center mt-4 flex items-center justify-center gap-1">
-          <Lock className="w-3 h-3" /> 3-Lock Fortified Gate · Owner {OWNER_EMAIL}
+          <Lock className="w-3 h-3" /> 2-Lock Fortified Gate · Owner {OWNER_EMAIL}
         </p>
       </div>
     </div>
@@ -559,8 +482,7 @@ export default function SuperAdmin() {
   }, [step]);
 
   if (step === 1) return <EmailLock onPass={() => setStep(2)} />;
-  if (step === 2) return <OtpLock onPass={() => setStep(3)} />;
-  if (step === 3) return <FaceLock onPass={() => setStep(4)} />;
+  if (step === 2) return <OtpLock onPass={() => setStep(4)} />;
 
   const Active = TABS.find((t) => t.id === tab).C;
   return (
@@ -572,7 +494,7 @@ export default function SuperAdmin() {
             <div className="text-sm font-heading font-bold text-white">👑 Owner Verified: {OWNER_EMAIL}</div>
           </div>
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="gold-text border gold-border rounded-full px-3 py-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Email ✅ Mobile ✅ Face ✅ · 3-Lock Passed</span>
+            <span className="gold-text border gold-border rounded-full px-3 py-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Email ✅ Mobile ✅ · 2-Lock Passed</span>
           </div>
         </div>
       </header>
