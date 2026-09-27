@@ -8,6 +8,14 @@ export const APP_VERSION = process.env.REACT_APP_VERSION || "1.0.0";
 
 const http = axios.create({ baseURL: API });
 
+export function safeOrigin() {
+  try {
+    return window.location.origin;
+  } catch (e) {
+    return BACKEND_URL || "";
+  }
+}
+
 export const api = {
   meta: () => http.get("/meta").then((r) => r.data),
   blocks: () => http.get("/blocks").then((r) => r.data),

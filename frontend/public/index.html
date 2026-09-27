@@ -24,6 +24,20 @@
         -->
         <title>Bharat App Builder | Your Assistant</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
+        <script>
+        (function(){
+          function isCrossOriginFrameError(err, msg){
+            var m = (msg||"") + " " + ((err&&err.message)||"");
+            return (err&&err.name==="SecurityError") || /Blocked a frame|cross-origin frame|from accessing a cross-origin/i.test(m);
+          }
+          window.addEventListener("error",function(e){
+            if(isCrossOriginFrameError(e.error, e.message)){ e.stopImmediatePropagation(); e.preventDefault(); return false; }
+          },true);
+          window.addEventListener("unhandledrejection",function(e){
+            var r=e.reason; if(isCrossOriginFrameError(r, r&&r.message)){ e.stopImmediatePropagation(); e.preventDefault(); return false; }
+          },true);
+        })();
+        </script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
     </head>
     <body>

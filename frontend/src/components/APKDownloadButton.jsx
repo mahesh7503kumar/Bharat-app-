@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Download, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "../lib/api";
+import { api, safeOrigin } from "../lib/api";
 
 export default function APKDownloadButton({ appId }) {
   const [update, setUpdate] = useState(null);
@@ -16,7 +16,7 @@ export default function APKDownloadButton({ appId }) {
       toast.success("Opening APK download (Play Store Ready)");
       window.open(latest.apkUrl, "_blank");
     } else {
-      const url = `https://www.pwabuilder.com/report?site=${window.location.origin}/preview/${appId}`;
+      const url = `https://www.pwabuilder.com/report?site=${safeOrigin()}/preview/${appId}`;
       toast.message("Opening PWABuilder to generate APK");
       window.open(url, "_blank");
     }

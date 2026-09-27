@@ -7,7 +7,8 @@ import {
   Megaphone, Users, Rocket, Copy, Wallet, Send, Save, Trash2, Ban, Eye, Plus,
   CheckCircle2, RefreshCw, Package, Download,
 } from "lucide-react";
-import { api, OWNER_EMAIL, ASSISTANT_NAME } from "../lib/api";
+import { api, OWNER_EMAIL, ASSISTANT_NAME, safeOrigin } from "../lib/api";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const inp = "w-full bg-black border border-purple-700/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500";
 const lbl = "text-[11px] text-zinc-400 mb-1 block";
@@ -292,7 +293,7 @@ function TabPublish() {
     await api.publishUpdate({ version: f.version, whatsNew: f.whatsNew, apkUrl: f.apkUrl, appId: apkName, packageName: c.packageName });
     toast.success("APK config generated & saved");
   };
-  const pwa = () => window.open(`https://www.pwabuilder.com/report?site=${window.location.origin}`, "_blank");
+  const pwa = () => window.open(`https://www.pwabuilder.com/report?site=${safeOrigin()}`, "_blank");
   return (
     <Card title="Publish Update + APK Auto Generate" icon={Rocket}>
       <div className="grid sm:grid-cols-3 gap-3">
@@ -469,7 +470,7 @@ const TABS = [
   { id: "H", label: "Payment + AdMob", icon: Wallet, C: TabPayment },
 ];
 
-export default function SuperAdmin() {
+function SuperAdminInner() {
   const [step, setStep] = useState(1);
   const [tab, setTab] = useState("A");
   const [analytics, setAnalytics] = useState({});
@@ -518,5 +519,14 @@ export default function SuperAdmin() {
         <div className="card-purple p-5"><Active /></div>
       </div>
     </div>
+  );
+}
+
+
+export default function SuperAdmin() {
+  return (
+    <ErrorBoundary>
+      <SuperAdminInner />
+    </ErrorBoundary>
   );
 }
