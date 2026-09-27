@@ -1,0 +1,131 @@
+{
+  "project_name": "BHARAT APP BUILDER",
+  "archetype": "THE PERFORMANCE PRO & ELECTRIC BHARAT CREATOR",
+  "theme": {
+    "mode": "dark",
+    "background": "#000000",
+    "primary": "#7c3aed",
+    "primary_hover": "#6d28d9",
+    "accent_gold": "#fbbf24",
+    "accent_gold_hover": "#f59e0b",
+    "surface": "#09090b",
+    "surface_card": "#121215",
+    "surface_elevated": "#1a1a22",
+    "border_color": "rgba(124, 58, 237, 0.2)",
+    "border_gold": "rgba(251, 191, 36, 0.3)",
+    "text_primary": "#ffffff",
+    "text_secondary": "#a1a1aa",
+    "text_muted": "#71717a",
+    "text_gold": "#fef08a",
+    "india_saffron_glow": "rgba(245, 158, 11, 0.15)",
+    "india_green_glow": "rgba(34, 197, 94, 0.15)"
+  },
+  "typography": {
+    "font_family_heading": "Outfit, Clash Display, sans-serif",
+    "font_family_body": "Plus Jakarta Sans, Inter, sans-serif",
+    "font_family_mono": "JetBrains Mono, Source Code Pro, monospace",
+    "h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white",
+    "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white",
+    "h3": "text-xl sm:text-2xl font-semibold text-white",
+    "h4": "text-lg sm:text-xl font-medium text-white",
+    "body": "text-base text-zinc-300 leading-relaxed",
+    "caption": "text-xs font-mono tracking-wider uppercase text-amber-400/90"
+  },
+  "branding_and_identity": {
+    "header_assistant_title": "Your Assistant",
+    "owner_email": "Mahesh7503kumar@gmail.com",
+    "brand_tagline": "India's #1 No-Code Mini-App Engine for Creators & Businesses",
+    "legal_shield": "Entertainment & Virtual Simulation Only. Virtual coins/points only, no real-money gambling.",
+    "bharat_touch": "Royal Purple backdrop with Subtle Gold Filigree & Tri-color ambient gradients (#7c3aed, #fbbf24, #16a34a)."
+  },
+  "layout_and_grid": {
+    "canvas_layout": "Three-pane builder grid: Left Sidebar (Block Palette & AI Prompts), Center Canvas (Phone Frame Preview), Right Panel (Block Inspector / Live Config)",
+    "superadmin_layout": "Sidebar navigation + Top Header with 3-Lock Security Status + 8 Tabbed Dashboard Workspace",
+    "spacing_scale": "p-4 md:p-6 lg:p-8 for containers; gap-4 for controls; p-6 inside cards to prevent border collision",
+    "border_radius": "rounded-xl for cards & previews, rounded-2xl for phone frame, rounded-full for CTAs and badges"
+  },
+  "key_components_spec": {
+    "header": {
+      "title": "Your Assistant",
+      "style": "Glassmorphic header bg-black/80 backdrop-blur-xl border-b border-purple-900/40 sticky top-0 z-50",
+      "features": ["Voice/Text Prompt Switcher", "Indian Regional Language Selector (Hindi/English/Hinglish)", "SuperAdmin Fast Lock", "APK Download Direct Action"]
+    },
+    "ai_assistant": {
+      "name": "Your Assistant",
+      "description": "Voice & text natural language generator powered by Gemini for mini-app blocks (Mehndi, Ludo virtual, UPI simulator, etc.)",
+      "voice_states": ["Listening", "Processing Voice Command", "Generating Blocks", "Applied to Canvas"]
+    },
+    "builder_canvas": {
+      "phone_frame": "Realistic Android mockup with dynamic notch, status bar, bottom nav, and direct drag-and-drop block placement",
+      "supported_blocks": [
+        "Header", "Banner Carousel", "ProductGrid", "Cart", "WhatsApp Connect", "Reviews & Rating", 
+        "Video Player", "Photo Gallery", "Mehndi Designs Studio", "Trading Signals (Virtual)", 
+        "Ludo Tournament (Virtual)", "Dating Profiles", "Ride Booking", "Grocery Store", 
+        "Clothing Store", "UPI Payment Mock", "Razorpay Gateway", "PhonePe Gateway", 
+        "Payment Selector", "AdMob Banner/Interstitial/Rewarded"
+      ]
+    },
+    "superadmin_security": {
+      "flow_name": "3-Lock Fortified Gate",
+      "locks": [
+        "Step 1: Admin Email Authentication (Mahesh7503kumar@gmail.com)",
+        "Step 2: Mobile OTP verification",
+        "Step 3: Biometric Face ID via face-api.js video camera feed"
+      ]
+    },
+    "superadmin_tabs": [
+      "AI Command Box & Direct Prompt Trigger",
+      "Monaco Live Code & JSON Config Editor",
+      "Remote Feature Toggles & System Flags",
+      "Global Banner & Promo Manager",
+      "User App Control & Live Monitoring Table",
+      "Publishing Engine & APK Builder Generator",
+      "Clone Builder Factory (1-Click App Templating)",
+      "Payment Gateway Settings & AdMob Monetization Manager"
+    ]
+  },
+  "image_urls": {
+    "app_preview_mockups": [
+      {
+        "url": "https://images.unsplash.com/photo-1551650975-87deedd944c3?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "category": "hero_preview",
+        "description": "Mobile app dashboard mockup on smartphone screen"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1551721434-8b94ddff0e6d?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "category": "mobile_builder",
+        "description": "Smartphone app screen builder overview"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1725347740936-4ce8cbb09584?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "category": "bharat_creator_banner",
+        "description": "Modern vibrant purple and gold phone aesthetic"
+      }
+    ]
+  },
+  "testing_and_accessibility": {
+    "data_testid_rule": "ALL interactive elements (buttons, inputs, tabs, modal triggers, drag handles) MUST include explicit role-based data-testid attributes.",
+    "required_data_testids": [
+      "your-assistant-chat-input",
+      "your-assistant-voice-btn",
+      "builder-canvas-phone-frame",
+      "block-palette-item",
+      "superadmin-3lock-email-input",
+      "superadmin-3lock-otp-input",
+      "superadmin-3lock-faceid-video",
+      "superadmin-tab-ai-command",
+      "superadmin-tab-monaco-editor",
+      "apk-download-button",
+      "legal-shield-consent-checkbox"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Strictly adhere to the dark theme with pure black #000000 background, vibrant purple #7c3aed primary, and gold #fbbf24 accent.",
+    "Ensure all top bar and assistant header labels display 'Your Assistant'.",
+    "Implement the 3-Lock Security Flow for SuperAdmin using real/mock face-api.js webcam scanning, mobile OTP verification, and email validation for Mahesh7503kumar@gmail.com.",
+    "Include all 8 tabs in the SuperAdmin panel with complete working forms, JSON code editor triggers, remote feature flags, and AdMob settings.",
+    "Ensure the legal disclaimer modal/footer ('Entertainment only, virtual coins only, no real money gambling') is clearly accessible.",
+    "Ensure drag-and-drop block placement works seamlessly on the Builder Canvas with live state update in the Android phone frame."
+  ]
+},
+overwrite:true,path:
