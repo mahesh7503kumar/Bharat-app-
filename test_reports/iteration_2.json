@@ -1,0 +1,25 @@
+{
+  "summary": "Frontend-only re-test after fixes for cross-origin runtime error and UpdateModal blocker. /superadmin now loads cleanly with NO runtime overlay, 2-lock (Email+SMS OTP) works and lands directly on the SuperAdmin panel (Face ID step removed). All 8 tabs A-H render without tripping the ErrorBoundary; Tab B Monaco editor mounts; Tab F PWA button opens PWABuilder using safeOrigin (https://payment-admob-hub.preview.emergentagent.com); Tab H save-upi/save-rzp/save-admob work. Regression: Home route Legal Shield + Your Assistant chat -> app creation -> preview -> APK download button all work. UpdateModal did NOT block any flow. Zero console/page errors captured.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SuperAdmin.jsx is 533 lines with 8 tab components inline — split per-tab files for maintainability.",
+    "ErrorBoundary swallow logic is duplicated in getDerivedStateFromError + componentDidCatch; can be extracted to a helper.",
+    "TabPublish default version '1.0.1' will still trigger UpdateModal for users < 1.0.1 — acceptable now that modal is semver+dismissible+route-guarded, but consider seeding APP_VERSION from backend to keep in sync.",
+    "TabPayment: Razorpay handler creates payment record client-side without server-side signature verification — insecure for production, acceptable for test mode."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not tested this run)", "frontend": "100%"},
+  "test_credentials": "Owner email Mahesh7503kumar@gmail.com; SuperAdmin mobile 9876543210; devOtp read from /api/superadmin/send-otp response.",
+  "seed_data_creation": "Test run created 1 assistant-generated app (id 1790519066679) via Your Assistant chat; UPI/RZP/AdMob payment config saved with test values.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Bug 'Runtime Error superadmin cross-origin frame' is FIXED. ErrorBoundary ignores SecurityError/'Blocked a frame', safeOrigin() wraps window.location.origin, and Razorpay is only initialised on user click (Tab H test-rzp). 2-lock flow is confirmed working end-to-end. Frontend all green.",
+  "rca of the issue": "Original cross-origin frame runtime error was caused by 3rd-party scripts (Razorpay checkout.js in particular) probing window.top from inside the Emergent preview iframe, throwing a SecurityError that React CRA's error overlay was surfacing. Fixed by (1) global window error+unhandledrejection listeners in index.html that swallow 'Blocked a frame' / SecurityError, (2) ErrorBoundary in ErrorBoundary.jsx returning hasError=false for SecurityError, (3) SuperAdmin wrapped in ErrorBoundary, and (4) safeOrigin() helper wrapping window.location.origin. Verified: /superadmin loads with 0 console/page errors, panel + all 8 tabs render cleanly."
+}
