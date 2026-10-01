@@ -22,7 +22,7 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-OWNER_EMAIL = "Mahesh7503kumar@gmail.com"
+OWNER_EMAIL = "mahesh7503kumar@gmail.com"
 ASSISTANT_NAME = "Your Assistant"
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
