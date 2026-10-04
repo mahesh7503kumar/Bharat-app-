@@ -4,7 +4,7 @@ const SuperAdmin = () => {
   const [step,setStep]=useState(1); const [isForget,setIsForget]=useState(false);
   const [email,setEmail]=useState(''); const [phone,setPhone]=useState(''); const [otpInput,setOtpInput]=useState('');
   const [newPass,setNewPass]=useState(''); const [confirmPass,setConfirmPass]=useState(''); const [realEmailOtp,setRealEmailOtp]=useState(''); const [realMobileOtp,setRealMobileOtp]=useState('');
-  const ALLOWED_EMAIL='mahesh7503kumar@gmail.com'; const ALLOWED_PHONES=['7503123456'];
+  const ALLOWED_EMAIL='mahesh7503kumar@gmail.com'; const ALLOWED_PHONES=['8700626256'];
 
   // 46 Features Storage
   const S = (k,d) => JSON.parse(localStorage.getItem(k)||JSON.stringify(d));
