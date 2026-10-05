@@ -4,7 +4,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 export const OWNER_EMAIL = process.env.REACT_APP_OWNER_EMAIL || "Mahesh7503kumar@gmail.com";
 export const ASSISTANT_NAME = "Your Assistant";
-export const APP_VERSION = process.env.REACT_APP_VERSION || "1.0.0";
+export const APP_VERSION = process.env.REACT_APP_VERSION || "1.1.1";
 
 const http = axios.create({ baseURL: API });
 
