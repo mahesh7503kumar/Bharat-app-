@@ -8,29 +8,9 @@
   "theme_color": "#FF6A00",
   "id": "bharat-ai-app",
   "icons": [
-    {
-      "src": "/IMG_5379.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/IMG_5379.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/IMG_5380.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/IMG_5380.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/IMG_5379.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/IMG_5379.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/IMG_5380.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/IMG_5380.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
