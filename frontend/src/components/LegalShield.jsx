@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { ShieldCheck, AlertTriangle } from "lucide-react";
-import { OWNER_EMAIL, api } from "../lib/api";
+import React from "react";
+import { AlertTriangle } from "lucide-react";
 
 const ILLEGAL = ["cash", "gambling", "betting", "real money", "teen patti", "satta", "casino"];
 
@@ -32,39 +31,24 @@ export function IllegalBanner({ show }) {
   );
 }
 
-export default function LegalShield({ agreed, setAgreed, keyword = "" }) {
+export default function LegalShield({ onAgree, keyword = "" }) {
   const illegal = detectIllegal(keyword);
 
-  useEffect(() => {
-    if (illegal.length) {
-      api.addLog({ event: "illegal_keyword", status: "forced_virtual", email: OWNER_EMAIL, detail: illegal.join(",") }).catch(() => {});
-    }
-  }, [keyword]);
-
   return (
-    <div className="card-purple p-4" data-testid="legal-shield">
+    <div className="card-purple p-3" data-testid="legal-shield">
       <IllegalBanner show={illegal.length > 0} />
-      <div className="flex items-start gap-3 mt-2">
-        <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-        <label className="flex items-start gap-2 cursor-pointer select-none">
-          <input
-            data-testid="legal-shield-consent-checkbox"
-            type="checkbox"
-            checked={agreed}
-            onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-1 accent-purple-600 w-4 h-4"
-          />
-          <span className="text-xs text-zinc-300 leading-relaxed">
-            I Agree — <b className="text-white">No Real Money Gambling / Betting</b>. This is
-            for <b className="text-amber-400">Entertainment &amp; Learning Only</b> using{" "}
-            <b className="text-amber-400">Virtual Coins</b>.
-          </span>
-        </label>
-      </div>
+      <p className="text-xs text-zinc-400">
+        User is responsible for app content. Please keep projects legal and safe.
+      </p>
       {illegal.length > 0 && (
-        <p className="text-[10px] text-red-400 mt-2">
-          Detected: {illegal.join(", ")} — app forced into virtual-only mode.
+        <p className="mt-2 text-[10px] text-amber-400">
+          Warning: {illegal.join(", ")} — review this content before continuing.
         </p>
+      )}
+      {onAgree && (
+        <button type="button" onClick={onAgree} className="mt-3 rounded bg-purple-600 px-4 py-2 text-xs font-bold text-white">
+          Continue
+        </button>
       )}
     </div>
   );
