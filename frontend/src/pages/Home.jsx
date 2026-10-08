@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Bot, Blocks, ShieldCheck, Sparkles, Rocket } from "lucide-react";
+import { Bot, Blocks, ShieldCheck, Sparkles, Rocket, LogIn, LogOut } from "lucide-react";
 import { api, ASSISTANT_NAME, APP_VERSION } from "../lib/api";
 import YourAssistantBrain from "../components/YourAssistantBrain";
 import BuilderCanvas from "../components/BuilderCanvas";
@@ -13,6 +13,11 @@ export default function Home() {
   const [banner, setBanner] = useState(null);
   const [payConfig, setPayConfig] = useState({});
   const [recent, setRecent] = useState([]);
+  const [email, setEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const ownerEmail = String(process.env.REACT_APP_OWNER_EMAIL || "").trim().toLowerCase();
+  const isLoggedIn = Boolean(email);
+  const isOwner = isLoggedIn && ownerEmail && email.toLowerCase() === ownerEmail;
 
   const refreshRecent = useCallback(() => {
     api.apps().then((a) => setRecent(a.slice(0, 4))).catch(() => {});
@@ -62,7 +67,23 @@ export default function Home() {
               <div className="text-[10px] text-zinc-400">Bharat App Builder v{APP_VERSION}</div>
             </div>
           </div>
-
+            <div className="flex items-center gap-2">
+              {isLoggedIn ? (
+                <>
+                  <span className="hidden sm:block max-w-40 truncate text-xs text-zinc-400" title={email}>{email}</span>
+                  <button type="button" onClick={() => setEmail("")} className="flex items-center gap-1.5 rounded-full border border-purple-700/30 px-3 py-1.5 text-xs font-bold text-zinc-200 hover:border-purple-500">
+                    <LogOut className="w-3.5 h-3.5" /> Logout
+                  </button>
+                </>
+              ) : (
+                <form onSubmit={(event) => { event.preventDefault(); const nextEmail = loginEmail.trim().toLowerCase(); if (nextEmail) { setEmail(nextEmail); setLoginEmail(""); } }} className="flex items-center gap-2">
+                  <input aria-label="Login email" value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} placeholder="Email to login" type="email" className="w-32 sm:w-44 rounded-full border border-purple-700/30 bg-black/30 px-3 py-1.5 text-xs text-white outline-none placeholder:text-zinc-500 focus:border-purple-500" />
+                  <button type="submit" className="flex items-center gap-1.5 rounded-full border border-purple-700/30 px-3 py-1.5 text-xs font-bold text-zinc-200 hover:border-purple-500">
+                    <LogIn className="w-3.5 h-3.5" /> Login
+                  </button>
+                </form>
+              )}
+            </div>
         </div>
       </header>
 
@@ -87,13 +108,13 @@ export default function Home() {
               <p className="text-xs text-zinc-400 mt-1">Choose your preferred AI assistant to get started.</p>
             </div>
             <div className="flex flex-wrap gap-2" role="tablist" aria-label="AI assistant providers">
-              {["ChatGPT", "Emergent", "Gemini", "Meta AI"].map((model) => (
+              {["ChatGPT", "Emergent", "Gemini", "Meta AI", ...(isOwner ? ["Super Admin"] : [])].map((model) => (
                 <button
                   key={model}
                   type="button"
                   role="tab"
                   aria-selected={aiModel === model}
-                  onClick={() => setAiModel(model)}
+                  onClick={() => model === "Super Admin" ? window.location.assign("/superadmin") : setAiModel(model)}
                   className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${aiModel === model ? "btn-purple text-white" : "bg-white/5 text-zinc-300 border border-purple-700/20 hover:border-purple-500"}`}
                 >
                   {model}
