@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Bot, Blocks, ShieldCheck, Sparkles, Crown, Rocket } from "lucide-react";
+import { Bot, Blocks, ShieldCheck, Sparkles, Rocket } from "lucide-react";
 import { api, ASSISTANT_NAME, APP_VERSION } from "../lib/api";
 import YourAssistantBrain from "../components/YourAssistantBrain";
 import BuilderCanvas from "../components/BuilderCanvas";
@@ -62,9 +62,7 @@ export default function Home() {
               <div className="text-[10px] text-zinc-400">Bharat App Builder v{APP_VERSION}</div>
             </div>
           </div>
-          <Link to="/superadmin" data-testid="superadmin-nav-link" className="flex items-center gap-2 text-xs font-bold gold-text border gold-border rounded-full px-4 py-2 hover:bg-amber-400/10">
-            <Crown className="w-4 h-4" /> Super Admin
-          </Link>
+
         </div>
       </header>
 
