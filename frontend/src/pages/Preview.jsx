@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ShieldCheck, ArrowLeft, ListChecks } from "lucide-react";
-import { api, ASSISTANT_NAME, OWNER_EMAIL } from "../lib/api";
+import { api, ASSISTANT_NAME } from "../lib/api";
 import { renderBlock } from "../blocks/index.jsx";
 import { LegalFooter, IllegalBanner } from "../components/LegalShield";
 import APKDownloadButton from "../components/APKDownloadButton";
@@ -82,7 +82,6 @@ export default function Preview() {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div><span className="text-zinc-500">App ID:</span> {app.appId}</div>
               <div><span className="text-zinc-500">Blocks:</span> {(app.blocks || []).length}</div>
-              <div><span className="text-zinc-500">Owner:</span> {OWNER_EMAIL}</div>
               <div><span className="text-zinc-500">Mode:</span> <span className="gold-text">Virtual Only</span></div>
             </div>
           </div>
