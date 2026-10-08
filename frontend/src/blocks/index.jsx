@@ -5,7 +5,6 @@ import {
   Star, Video, Images, Flower2, TrendingUp, Dice5, Heart, Car, Apple,
   Shirt, IndianRupee, CreditCard, Smartphone, Wallet, Megaphone, MonitorPlay, Gift,
 } from "lucide-react";
-import { OWNER_EMAIL } from "../lib/api";
 
 export const BLOCK_META = {
   header: { name: "Header", icon: LayoutTemplate, cat: "layout" },
@@ -49,7 +48,6 @@ function AdMobBox({ label }) {
         <Megaphone className="w-5 h-5 mx-auto text-amber-400 mb-1" />
         <div className="text-amber-300 text-xs font-bold">📢 AdMob {label} Ad</div>
         <div className="text-[10px] text-zinc-400 mt-1">Your Ad Will Show Here</div>
-        <div className="text-[9px] text-amber-400/80 mt-1">Owner Earnings: {OWNER_EMAIL}</div>
         <button className="mt-2 text-[10px] btn-gold rounded-full px-3 py-1">Test Ad</button>
       </div>
     </Sec>

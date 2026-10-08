@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ShieldCheck, AlertTriangle } from "lucide-react";
-import { OWNER_EMAIL, ASSISTANT_NAME, api } from "../lib/api";
+import { OWNER_EMAIL, api } from "../lib/api";
 
 const ILLEGAL = ["cash", "gambling", "betting", "real money", "teen patti", "satta", "casino"];
 
@@ -15,7 +15,7 @@ export function LegalFooter() {
       data-testid="legal-footer"
       className="text-center text-[10px] sm:text-xs text-zinc-500 py-3 px-4 border-t border-purple-900/30"
     >
-      For Entertainment Only | Virtual Coins Only | No Real Money | Owner {OWNER_EMAIL} | {ASSISTANT_NAME}
+      For Entertainment Only | Virtual Coins Only | No Real Money
     </div>
   );
 }

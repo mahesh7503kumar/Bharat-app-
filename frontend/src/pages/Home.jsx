@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Bot, Blocks, ShieldCheck, Sparkles, Crown, Rocket } from "lucide-react";
-import { api, ASSISTANT_NAME, OWNER_EMAIL, APP_VERSION } from "../lib/api";
+import { api, ASSISTANT_NAME, APP_VERSION } from "../lib/api";
 import YourAssistantBrain from "../components/YourAssistantBrain";
 import BuilderCanvas from "../components/BuilderCanvas";
 import LegalShield, { LegalFooter } from "../components/LegalShield";
 
 export default function Home() {
   const [tab, setTab] = useState("assistant");
+  const [aiModel, setAiModel] = useState("ChatGPT");
   const [agreed, setAgreed] = useState(false);
   const [banner, setBanner] = useState(null);
   const [payConfig, setPayConfig] = useState({});
@@ -81,6 +82,28 @@ export default function Home() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 pb-4">
+        <div className="card-purple p-4 mb-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-xs font-bold text-amber-400 uppercase tracking-wide">Super AI Assistant</div>
+              <p className="text-xs text-zinc-400 mt-1">Choose your preferred AI assistant to get started.</p>
+            </div>
+            <div className="flex flex-wrap gap-2" role="tablist" aria-label="AI assistant providers">
+              {["ChatGPT", "Emergent", "Gemini", "Meta AI"].map((model) => (
+                <button
+                  key={model}
+                  type="button"
+                  role="tab"
+                  aria-selected={aiModel === model}
+                  onClick={() => setAiModel(model)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${aiModel === model ? "btn-purple text-white" : "bg-white/5 text-zinc-300 border border-purple-700/20 hover:border-purple-500"}`}
+                >
+                  {model}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         <div className="flex gap-2 mb-4">
           <button data-testid="tab-assistant" onClick={() => setTab("assistant")} className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold ${tab === "assistant"? "btn-purple" : "bg-white/5 text-zinc-300 border border-purple-700/20"}`}><Bot className="w-4 h-4" /> Your Assistant</button>
           <button data-testid="tab-builder" onClick={() => setTab("builder")} className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold ${tab === "builder"? "btn-purple" : "bg-white/5 text-zinc-300 border border-purple-700/20"}`}><Blocks className="w-4 h-4" /> Drag-Drop Builder</button>
