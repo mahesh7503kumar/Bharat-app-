@@ -1,6 +1,8 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
 
+const founderEmail = String(process.env.REACT_APP_FOUNDER_EMAIL || process.env.REACT_APP_OWNER_EMAIL || '').trim().toLowerCase();
+
 // CARD BAHAR - Isliye keyboard nahi gayab hoga!
 const CardBox = ({title, children}) => (
   <div className="bg-[#1E1E1E] rounded-[20px] p-4 text-white border border-[#2A2A2A]">
@@ -35,6 +37,18 @@ const SuperAdmin = () => {
   },[]);
 
   const showMsg=(t)=>{ setMsg(t); setTimeout(()=>setMsg(''),2500); };
+  const runAiCommand=async()=>{
+    const command=aiCommand.trim();
+    if(!command) return showMsg('Enter a command first');
+    showMsg('Thinking...');
+    try {
+      const response=await fetch('/api/admin-ai',{method:'POST',headers:{'Content-Type':'application/json','x-founder-email':email},body:JSON.stringify({command,email})});
+      const data=await response.json();
+      if(!response.ok) throw new Error(data.error||'AI request failed');
+      showMsg(data.committed ? `AI completed and pushed ${data.files.length} file(s)` : 'AI response ready; no files pushed');
+      setAiCommand('');
+    } catch(error) { showMsg(error.message||'AI request failed'); }
+  };
 
   const tabs=[
     {id:'dash',l:'Home',i:'🏠'},{id:'history',l:'History',i:'🕒'},{id:'device',l:'Device',i:'📱'},{id:'2fa',l:'2FA',i:'🛡️'},{id:'razor',l:'Razor',i:'⚡'},{id:'credit',l:'Credit',i:'💳'},{id:'expiry',l:'Expiry',i:'📅'},{id:'ai',l:'AI',i:'🤖'},{id:'backup',l:'Backup',i:'💾'},{id:'push',l:'Push',i:'🔔'},{id:'ban',l:'Ban',i:'🚫'},{id:'live',l:'Live',i:'🟢'},{id:'chat',l:'Chat',i:'💬'},{id:'kill',l:'Kill',i:'💀'},{id:'banner',l:'Banner',i:'📢'},{id:'ver',l:'Version',i:'🔢'},{id:'pubfee',l:'Pub Fee',i:'💰'},{id:'vault',l:'Vault',i:'🔐'},{id:'firebase',l:'Firebase',i:'🔥'},{id:'revenue',l:'Revenue',i:'💵'},{id:'blocks',l:'Blocks',i:'🧱'},{id:'rotation',l:'Rotate',i:'🔄'},{id:'admob',l:'AdMob',i:'📊'},{id:'legal',l:'Legal',i:'⚖️'},{id:'storage',l:'Storage',i:'🗄️'},{id:'template',l:'Bazaar',i:'🛒'},{id:'refer',l:'Refer',i:'👥'},{id:'reseller',l:'Reseller',i:'🤝'},{id:'coupon',l:'Coupon',i:'🎟️'},{id:'adshare',l:'AdShare',i:'📈'},{id:'aff',l:'Affiliate',i:'🔗'},{id:'team',l:'Team',i:'👨‍👩‍👧'},{id:'audit',l:'Audit',i:'📝'},{id:'webhook',l:'Webhook',i:'🔌'},{id:'rate',l:'Rate',i:'⏱️'},{id:'search',l:'Search',i:'🔍'},{id:'ab',l:'AB Test',i:'🧪'},{id:'export',l:'Export',i:'📦'},{id:'error',l:'Error',i:'❌'},{id:'lucky',l:'Lucky',i:'🎡'},{id:'academy',l:'Academy',i:'🎓'},{id:'logo',l:'Logo',i:'🎨'},{id:'voice',l:'Voice',i:'🎤'},{id:'translate',l:'Translate',i:'🌐'},{id:'review',l:'Review',i:'⭐'},{id:'ss2app',l:'SS2App',i:'📸'},{id:'bharatgpt',l:'BharatGPT',i:'🇮🇳'},{id:'publish',l:'Publish',i:'🚀'},{id:'wa',l:'WhatsApp',i:'💚'},{id:'analytics',l:'Analytics',i:'📊'},{id:'appreview',l:'Reviews',i:'⭐'},{id:'aab',l:'AAB',i:'📦'},{id:'domain',l:'Domain',i:'🌐'},{id:'pushhist',l:'PushHist',i:'🔔'},{id:'subs',l:'Subs',i:'💳'},{id:'tawk',l:'Tawk',i:'💬'},{id:'lead',l:'Lead',i:'🏆'},{id:'clone',l:'Clone',i:'🛡️'},{id:'seo',l:'SEO',i:'📸'},{id:'aicon',l:'Icon',i:'✨'},{id:'voice2',l:'Voice2',i:'🎤'},
@@ -45,7 +59,7 @@ const SuperAdmin = () => {
       <div className="bg-white rounded-[28px] p-6 w-full max-w-[360px]">
         <h1 className="font-black text-center">🔐 MALIK 61</h1>
         <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="mahesh7503kumar@gmail.com" className="w-full bg-black text-white rounded-full px-5 py-3 mt-5 text-[12px] outline-none" />
-        <button onClick={()=>{ if(email.toLowerCase()==='mahesh7503kumar@gmail.com'){ localStorage.setItem('owner_verified','true'); setIsLocked(false); } else showMsg('Only Malik'); }} className="w-full bg-[#FFC94A] text-black rounded-full py-3 font-bold mt-3">Login</button>
+        <button onClick={()=>{ if(founderEmail && email.trim().toLowerCase()===founderEmail){ localStorage.setItem('owner_verified','true'); setIsLocked(false); } else showMsg('Founder access required'); }} className="w-full bg-[#FFC94A] text-black rounded-full py-3 font-bold mt-3">Login</button>
         {msg&&<p className="text-center mt-3 text-[11px] bg-black text-yellow-300 p-2 rounded-full">{msg}</p>}
       </div>
     </div>
@@ -75,7 +89,7 @@ const SuperAdmin = () => {
           {activeTab==='pubfee'&&<CardBox title="💰 Pub Fee"><input type="number" inputMode="numeric" value={publishFee} onChange={e=>setPublishFee(e.target.value)} className="w-full bg-black rounded-full px-4 py-3 text-center font-bold text-white outline-none" /><button onClick={()=>{localStorage.setItem('publish_fee',publishFee); showMsg('✅ Saved ₹'+publishFee)}} className="w-full mt-3 bg-[#FFC94A] text-black rounded-full py-3 font-bold">Save Fee</button></CardBox>}
           {activeTab==='razor'&&<CardBox title="Razorpay"><input value={razorKey} onChange={e=>setRazorKey(e.target.value)} placeholder="Razor Key" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><input value={upiId} onChange={e=>setUpiId(e.target.value)} placeholder="UPI" className="w-full bg-black rounded-full px-4 py-3 text-[11px] mt-2 text-white outline-none" /><button onClick={()=>showMsg('Saved')} className="w-full mt-3 bg-[#FFC94A] text-black rounded-full py-3 font-bold">Save</button></CardBox>}
           {activeTab==='search'&&<CardBox title="Global Search"><input autoFocus value={globalSearch} onChange={e=>setGlobalSearch(e.target.value)} placeholder="Search user/app" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={()=>showMsg('Search: '+globalSearch)} className="w-full mt-2 bg-[#FFC94A] text-black rounded-full py-2 font-bold">Search</button></CardBox>}
-          {activeTab==='ai'&&<CardBox title="AI Command"><input value={aiCommand} onChange={e=>setAiCommand(e.target.value)} placeholder="/free email" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={()=>showMsg('AI: '+aiCommand)} className="w-full mt-2 bg-[#7CB8E8] text-white rounded-full py-2 font-bold">Run AI</button></CardBox>}
+          {activeTab==='ai'&&<CardBox title="AI Command"><input value={aiCommand} onChange={e=>setAiCommand(e.target.value)} placeholder="/free email" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={runAiCommand} className="w-full mt-2 bg-[#7CB8E8] text-white rounded-full py-2 font-bold">Run AI</button></CardBox>}
           {activeTab==='banner'&&<CardBox title="Banner"><input value={bannerText} onChange={e=>setBannerText(e.target.value)} placeholder="Banner Text" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={()=>showMsg('Saved')} className="w-full mt-2 bg-[#FFC94A] text-black rounded-full py-2 font-bold">Save</button></CardBox>}
 
           {!['dash','pubfee','razor','search','ai','banner'].includes(activeTab)&&(
