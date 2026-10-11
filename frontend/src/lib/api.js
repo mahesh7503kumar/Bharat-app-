@@ -1,7 +1,10 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-export const API = `${BACKEND_URL}/api`;
+const configuredBackendUrl = String(process.env.REACT_APP_BACKEND_URL || '').trim();
+const BACKEND_URL = configuredBackendUrl && /^https?:\/\//i.test(configuredBackendUrl)
+  ? configuredBackendUrl.replace(/\/$/, '')
+  : '';
+export const API = BACKEND_URL ? `${BACKEND_URL}/api` : "/api";
 export const OWNER_EMAIL = process.env.REACT_APP_OWNER_EMAIL || "Mahesh7503kumar@gmail.com";
 export const ASSISTANT_NAME = "Your Assistant";
 export const APP_VERSION = process.env.REACT_APP_VERSION || "1.1.1";
