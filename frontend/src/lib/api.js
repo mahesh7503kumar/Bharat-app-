@@ -1,6 +1,7 @@
 import axios from "axios";
 
 // --- Core App Exports ---
+export const API = process.env.REACT_APP_API_URL || "/api";
 export const APP_VERSION = "1.1.0";
 export const BUILDER_VERSION = "61";
 export const APP_NAME = "Bharat App Builder";
