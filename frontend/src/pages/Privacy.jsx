@@ -7,7 +7,15 @@ export default function Privacy() {
   const [data, setData] = useState(null);
   useEffect(() => { api.getPrivacy ? null : null; }, []);
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/privacy/${appId}`).then((r) => r.json()).then(setData).catch(() => {});
+    const backendUrl = String(process.env.REACT_APP_BACKEND_URL || '').trim().replace(/\/$/, '');
+    const endpoint = backendUrl && /^https?:\/\//i.test(backendUrl)
+      ? `${backendUrl}/api/privacy/${appId}`
+      : `/api/privacy/${appId}`;
+
+    fetch(endpoint)
+      .then((r) => r.json())
+      .then(setData)
+      .catch((error) => console.error('[v0] Privacy request failed:', error));
   }, [appId]);
 
   return (

@@ -47,7 +47,10 @@ const SuperAdmin = () => {
       if(!response.ok) throw new Error(data.error||'AI request failed');
       showMsg(data.committed ? `AI completed and pushed ${data.files.length} file(s)` : 'AI response ready; no files pushed');
       setAiCommand('');
-    } catch(error) { showMsg(error.message||'AI request failed'); }
+    } catch(error) {
+      console.error('[v0] Super Admin AI request failed:', error);
+      showMsg(error instanceof Error ? error.message : 'AI request failed');
+    }
   };
 
   const tabs=[
