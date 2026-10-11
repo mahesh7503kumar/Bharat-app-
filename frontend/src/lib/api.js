@@ -8,7 +8,6 @@ export const APP_NAME = "Bharat App Builder";
 export const APP_DESCRIPTION = "Build apps without coding";
 
 // --- API Exports ---
-export const API = "/api";
 export const API_URL = "/api";
 export const BASE_URL = "/api";
 
