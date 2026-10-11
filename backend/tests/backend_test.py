@@ -4,7 +4,7 @@ import time
 import pytest
 import requests
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://payment-admob-hub.preview.emergentagent.com').rstrip('/')
+BASE_URL = 'https://payment-admob-hub.preview.emergentagent.com'
 API = f"{BASE_URL}/api"
 OWNER = "Mahesh7503kumar@gmail.com"
 
