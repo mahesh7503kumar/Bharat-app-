@@ -1,9 +1,8 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
 
-const founderEmail = String(process.env.REACT_APP_FOUNDER_EMAIL || process.env.REACT_APP_OWNER_EMAIL || '').trim().toLowerCase();
+const ENV_FOUNDER = (import.meta.env.VITE_FOUNDER_EMAIL || import.meta.env.REACT_APP_FOUNDER_EMAIL || import.meta.env.REACT_APP_OWNER_EMAIL || 'mahesh7503kumar@gmail.com').trim().toLowerCase();
 
-// CARD BAHAR - Isliye keyboard nahi gayab hoga!
 const CardBox = ({title, children}) => (
   <div className="bg-[#1E1E1E] rounded-[20px] p-4 text-white border border-[#2A2A2A]">
     <h3 className="font-bold text-[13px]">{title}</h3>
@@ -16,40 +15,58 @@ const SuperAdmin = () => {
   const [msg,setMsg]=useState('');
   const [isLocked,setIsLocked]=useState(true);
   const [email,setEmail]=useState('');
-  const [phone,setPhone]=useState('');
-  const [otpInput,setOtpInput]=useState('');
-  const [step,setStep]=useState(1);
+  const [aiCommand,setAiCommand]=useState('');
   const [publishFee,setPublishFee]=useState('299');
-  const [appVersion]=useState('1.1.1');
+  const [appVersion] = useState('1.1.1');
   const [razorKey,setRazorKey]=useState('');
   const [upiId,setUpiId]=useState('mahesh@upi');
   const [globalSearch,setGlobalSearch]=useState('');
-  const [aiCommand,setAiCommand]=useState('');
   const [bannerText,setBannerText]=useState('');
-  const [legal,setLegal]=useState('Privacy Policy');
-  const [webhook,setWebhook]=useState('');
-  const [expiryDays,setExpiryDays]=useState('30');
 
   useEffect(()=>{
     if(localStorage.getItem('owner_verified')==='true') setIsLocked(false);
     const pf=localStorage.getItem('publish_fee');
     if(pf) setPublishFee(pf);
+    const savedEmail = localStorage.getItem('founder_email');
+    if(savedEmail) setEmail(savedEmail);
   },[]);
 
-  const showMsg=(t)=>{ setMsg(t); setTimeout(()=>setMsg(''),2500); };
+  const showMsg=(t)=>{ setMsg(t); setTimeout(()=>setMsg(''),3000); };
+
+  const handleLogin = () => {
+    const cleanEmail = email.trim().toLowerCase();
+    if(!cleanEmail) return showMsg('Email dalo pehle');
+    // Client side check - ENV se ya default founder se
+    if(cleanEmail === ENV_FOUNDER || cleanEmail.includes('mahesh7503kumar')) {
+      localStorage.setItem('owner_verified','true');
+      localStorage.setItem('founder_email', cleanEmail);
+      setIsLocked(false);
+      showMsg('✅ Welcome Malik!');
+    } else {
+      showMsg('❌ Sirf Founder access: '+ENV_FOUNDER);
+    }
+  };
+
   const runAiCommand=async()=>{
     const command=aiCommand.trim();
     if(!command) return showMsg('Enter a command first');
-    showMsg('Thinking...');
+    const founderEmailToSend = email.trim().toLowerCase() || localStorage.getItem('founder_email') || ENV_FOUNDER;
+    showMsg('Thinking... 🤖');
     try {
-      const response=await fetch('/api/admin-ai',{method:'POST',headers:{'Content-Type':'application/json','x-founder-email':email},body:JSON.stringify({command,email})});
-      const data=await response.json();
+      const response=await fetch('/api/admin-ai',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-founder-email':founderEmailToSend},
+        body:JSON.stringify({command,email:founderEmailToSend})
+      });
+      const text = await response.text();
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error(text.slice(0,200) || 'Server error'); }
       if(!response.ok) throw new Error(data.error||'AI request failed');
-      showMsg(data.committed ? `AI completed and pushed ${data.files.length} file(s)` : 'AI response ready; no files pushed');
+      showMsg(data.committed? `✅ Pushed ${data.files.length} file(s)` : '✅ AI Ready');
       setAiCommand('');
     } catch(error) {
-      console.error('[v0] Super Admin AI request failed:', error);
-      showMsg(error instanceof Error ? error.message : 'AI request failed');
+      console.error('Super Admin AI failed:', error);
+      showMsg(error.message || 'AI request failed');
     }
   };
 
@@ -61,8 +78,9 @@ const SuperAdmin = () => {
     <div className="min-h-screen bg-[#121212] flex items-center justify-center p-4">
       <div className="bg-white rounded-[28px] p-6 w-full max-w-[360px]">
         <h1 className="font-black text-center">🔐 MALIK 61</h1>
+        <p className="text-[10px] text-center text-gray-500 mt-1">{ENV_FOUNDER}</p>
         <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="mahesh7503kumar@gmail.com" className="w-full bg-black text-white rounded-full px-5 py-3 mt-5 text-[12px] outline-none" />
-        <button onClick={()=>{ if(founderEmail && email.trim().toLowerCase()===founderEmail){ localStorage.setItem('owner_verified','true'); setIsLocked(false); } else showMsg('Founder access required'); }} className="w-full bg-[#FFC94A] text-black rounded-full py-3 font-bold mt-3">Login</button>
+        <button onClick={handleLogin} className="w-full bg-[#FFC94A] text-black rounded-full py-3 font-bold mt-3">Login</button>
         {msg&&<p className="text-center mt-3 text-[11px] bg-black text-yellow-300 p-2 rounded-full">{msg}</p>}
       </div>
     </div>
@@ -72,11 +90,9 @@ const SuperAdmin = () => {
     <div className="min-h-screen bg-[#121212] flex justify-center">
       <div className="w-full max-w-[520px] bg-[#121212] min-h-screen flex flex-col relative pb-[160px]">
         <div className="px-4 pt-3"><div className="bg-[#1E1E1E] rounded-full px-4 py-2 flex justify-center"><p className="text-[11px] text-gray-400 font-bold">MALIK • 61 v{appVersion}</p></div></div>
-        <div className="px-4 mt-3"><div className="bg-[#1E1E1E] rounded-[16px] px-5 py-4 flex justify-between items-center"><h1 className="font-black text-[22px] text-white">SuperAdmin</h1><div className="w-8 h-8 bg-[#2A2A2A] rounded-full flex items-center justify-center text-white">⚙️</div></div></div>
-
+        <div className="px-4 mt-3"><div className="bg-[#1E1E1E] rounded-[16px] px-5 py-4 flex justify-between items-center"><h1 className="font-black text-[22px] text-white">SuperAdmin</h1><button onClick={()=>{localStorage.clear(); location.reload();}} className="w-8 h-8 bg-[#2A2A2A] rounded-full flex items-center justify-center text-white">⚙️</button></div></div>
         <div className="px-4 py-3 flex-1">
           {msg&&<p className="bg-[#FFC94A] text-black text-center text-[10px] p-2 rounded-full mb-3 font-bold">{msg}</p>}
-
           {activeTab==='dash'&&(
             <div className="bg-[#1E1E1E] rounded-[20px] p-5">
               <h2 className="font-bold text-[18px] text-white">Dashboard</h2>
@@ -88,27 +104,22 @@ const SuperAdmin = () => {
               </div>
             </div>
           )}
-
           {activeTab==='pubfee'&&<CardBox title="💰 Pub Fee"><input type="number" inputMode="numeric" value={publishFee} onChange={e=>setPublishFee(e.target.value)} className="w-full bg-black rounded-full px-4 py-3 text-center font-bold text-white outline-none" /><button onClick={()=>{localStorage.setItem('publish_fee',publishFee); showMsg('✅ Saved ₹'+publishFee)}} className="w-full mt-3 bg-[#FFC94A] text-black rounded-full py-3 font-bold">Save Fee</button></CardBox>}
+          {activeTab==='ai'&&<CardBox title="AI Command (Super AI)"><input autoFocus value={aiCommand} onChange={e=>setAiCommand(e.target.value)} onKeyDown={e=>{if(e.key==='Enter') runAiCommand()}} placeholder="Jaise: change theme to blue" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={runAiCommand} className="w-full mt-3 bg-[#7CB8E8] text-white rounded-full py-3 font-bold">🚀 Run AI & Push to GitHub</button><p className="text-[9px] text-gray-500 mt-2">Founder: {email}</p></CardBox>}
           {activeTab==='razor'&&<CardBox title="Razorpay"><input value={razorKey} onChange={e=>setRazorKey(e.target.value)} placeholder="Razor Key" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><input value={upiId} onChange={e=>setUpiId(e.target.value)} placeholder="UPI" className="w-full bg-black rounded-full px-4 py-3 text-[11px] mt-2 text-white outline-none" /><button onClick={()=>showMsg('Saved')} className="w-full mt-3 bg-[#FFC94A] text-black rounded-full py-3 font-bold">Save</button></CardBox>}
           {activeTab==='search'&&<CardBox title="Global Search"><input autoFocus value={globalSearch} onChange={e=>setGlobalSearch(e.target.value)} placeholder="Search user/app" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={()=>showMsg('Search: '+globalSearch)} className="w-full mt-2 bg-[#FFC94A] text-black rounded-full py-2 font-bold">Search</button></CardBox>}
-          {activeTab==='ai'&&<CardBox title="AI Command"><input value={aiCommand} onChange={e=>setAiCommand(e.target.value)} placeholder="/free email" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={runAiCommand} className="w-full mt-2 bg-[#7CB8E8] text-white rounded-full py-2 font-bold">Run AI</button></CardBox>}
           {activeTab==='banner'&&<CardBox title="Banner"><input value={bannerText} onChange={e=>setBannerText(e.target.value)} placeholder="Banner Text" className="w-full bg-black rounded-full px-4 py-3 text-[11px] text-white outline-none" /><button onClick={()=>showMsg('Saved')} className="w-full mt-2 bg-[#FFC94A] text-black rounded-full py-2 font-bold">Save</button></CardBox>}
-
           {!['dash','pubfee','razor','search','ai','banner'].includes(activeTab)&&(
             <CardBox title={`${tabs.find(t=>t.id===activeTab)?.i} ${tabs.find(t=>t.id===activeTab)?.l}`}>
-              <p className="text-[11px] text-gray-400">Feature Active ✅ - Build Safe - Keyboard Fix</p>
-              <p className="text-[10px] text-gray-500 mt-2">Pub Fee: ₹{publishFee} | Version: {appVersion}</p>
+              <p className="text-[11px] text-gray-400">Feature Active ✅ - Keyboard Fixed</p>
               <button onClick={()=>showMsg(tabs.find(t=>t.id===activeTab)?.l+' Saved')} className="w-full mt-3 bg-[#FFC94A] text-black rounded-full py-2 font-bold">Save</button>
             </CardBox>
           )}
         </div>
-
         <div className="fixed bottom-[18px] left-1/2 -translate-x-1/2 w-[94%] max-w-[500px] z-50">
-          <div className="bg-[#1E1E1E] rounded-full p-2 flex gap-1 overflow-x-auto border border-[#2A2A2A]">
+          <div className="bg-[#1E1E1E] rounded-full p-2 flex gap-1 overflow-x-auto border border-[#2A2A2A] no-scrollbar">
             {tabs.map(t=>{ const a=activeTab===t.id; return <button key={t.id} onClick={()=>setActiveTab(t.id)} className={`flex flex-col items-center px-3 py-2 rounded-full text-[9px] font-bold whitespace-nowrap min-w-[55px] ${a?'bg-[#FFC94A] text-black':'text-gray-400'}`}><span className="text-[14px]">{t.i}</span>{t.l}</button> })}
           </div>
-          <p className="text-[9px] text-gray-500 text-center mt-2">61 Features • Keyboard Fixed ✅ • Pub Fee ₹{publishFee}</p>
         </div>
       </div>
     </div>
